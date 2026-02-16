@@ -1,0 +1,44 @@
+<Page
+    x:Class="WMOffice.Views.CableCalculatorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WMOffice.Views"
+    xmlns:vm="using:WMOffice.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="20" Padding="30">
+        <TextBlock Text="Cable Sizing Calculator" Style="{StaticResource TitleTextBlockStyle}" />
+
+        <!-- Inputs -->
+        <StackPanel Spacing="10">
+            <TextBlock Text="Load (Amps)" FontWeight="SemiBold" />
+            <NumberBox Value="{x:Bind ViewModel.LoadAmps, Mode=TwoWay}" PlaceholderText="Enter current..." Minimum="0" SpinButtonPlacementMode="Inline" />
+
+            <TextBlock Text="Length (Meters)" FontWeight="SemiBold" />
+            <NumberBox Value="{x:Bind ViewModel.LengthMeters, Mode=TwoWay}" PlaceholderText="Enter distance..." Minimum="1" SpinButtonPlacementMode="Inline" />
+
+            <TextBlock Text="System Voltage" FontWeight="SemiBold" />
+            <ComboBox SelectedIndex="{x:Bind ViewModel.SelectedVoltageIndex, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="230V (1-Phase)" Tag="230" />
+                <ComboBoxItem Content="400V (3-Phase)" Tag="400" />
+            </ComboBox>
+
+            <CheckBox IsChecked="{x:Bind ViewModel.IsGround, Mode=TwoWay}" Content="Installed in Ground?" />
+        </StackPanel>
+
+        <!-- Action -->
+        <Button Content="Calculate Cable Size" Command="{x:Bind ViewModel.CalculateCommand}" HorizontalAlignment="Stretch" Style="{StaticResource AccentButtonStyle}" />
+        <Button Content="Save to Project" Command="{x:Bind ViewModel.SaveToProjectCommand}" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
+
+        <!-- Result -->
+        <Border BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="4" Padding="15" Margin="0,20,0,0">
+            <StackPanel>
+                <TextBlock Text="Recommended Size:" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="{x:Bind ViewModel.ResultText, Mode=OneWay}" FontSize="24" FontWeight="Bold" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" Margin="0,10,0,0" />
+                <TextBlock Text="{x:Bind ViewModel.DetailsText, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,5,0,0" Opacity="0.7" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</Page>

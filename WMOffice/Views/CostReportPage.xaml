@@ -1,0 +1,86 @@
+<Page x:Class="WMOffice.Views.CostReportPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:WMOffice.Views"
+      xmlns:vm="clr-namespace:WMOffice.ViewModels"
+      xmlns:models="clr-namespace:WMOffice.Models"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Cost Reports">
+
+    <Page.DataContext>
+        <vm:CostReportViewModel />
+    </Page.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Sidebar: List of Reports -->
+        <Border BorderBrush="#DDD" BorderThickness="0,0,1,0" Background="#F5F5F5">
+            <DockPanel>
+                <Button DockPanel.Dock="Top" Content="+ New Report" Command="{Binding AddReportCommand}" Margin="10" Padding="5"/>
+                <ListView ItemsSource="{Binding Reports}" SelectedItem="{Binding SelectedReport}" BorderThickness="0" Background="Transparent">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Title}" Padding="5" FontWeight="SemiBold"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </DockPanel>
+        </Border>
+
+        <!-- Right Content: Report Details -->
+        <Grid Grid.Column="1" Margin="20" Visibility="{Binding SelectedReport, Converter={StaticResource NullToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Orientation="Vertical" Margin="0,0,0,20">
+                <TextBlock Text="Report Details" FontSize="18" FontWeight="Bold" Foreground="#333"/>
+                <TextBox Text="{Binding SelectedReport.Title, UpdateSourceTrigger=PropertyChanged}" FontSize="16" Margin="0,10,0,5"/>
+                <TextBox Text="{Binding SelectedReport.Description, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" MinHeight="40"/>
+                <TextBlock Text="{Binding SelectedReport.TotalCost, StringFormat='Total: {0:C}'}" FontWeight="Bold" Foreground="DarkGreen" Margin="0,10,0,0"/>
+            </StackPanel>
+
+            <!-- Hierarchical Data Display -->
+            <DockPanel Grid.Row="1">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,10">
+                    <Button Content="+ Add Category" Command="{Binding AddCategoryCommand}" Margin="0,0,10,0" Padding="10,5"/>
+                </StackPanel>
+
+                <TreeView ItemsSource="{Binding SelectedReport.Categories}" BorderThickness="1" BorderBrush="#EEE">
+                    <TreeView.Resources>
+                        <!-- Category Template -->
+                        <HierarchicalDataTemplate DataType="{x:Type models:CostCategory}" ItemsSource="{Binding LineItems}">
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <TextBlock Text="📁 " VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MinWidth="100" Margin="2"/>
+                                <TextBlock Text="{Binding TotalCategoryCost, StringFormat=' ({0:C})'}" Foreground="Gray" VerticalAlignment="Center"/>
+                                <Button Content="Add Item" 
+                                        Command="{Binding DataContext.AddLineItemCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                                        CommandParameter="{Binding}" 
+                                        Margin="10,0,0,0" FontSize="10" Padding="4,2"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+
+                        <!-- Line Item Template -->
+                        <DataTemplate DataType="{x:Type models:LineItem}">
+                            <StackPanel Orientation="Horizontal" Margin="20,2,2,2">
+                                <TextBlock Text="📄 " VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" MinWidth="150" Margin="2"/>
+                                <TextBox Text="{Binding Amount, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" TextAlignment="Right" Margin="2"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Page>
